@@ -1,5 +1,7 @@
 const request = require("request-promise");
 const cheerio = require("cheerio");
+const fs = require("fs");
+const asyncJSON = require("async-json");
 
 const { Course } = require("./course");
 
@@ -39,16 +41,22 @@ function parseSubject(subject) {
     }
   })
     .then($ => {
-      const courses = $("div.course");
-      for (var i = 0; i < courses.length; i++) {
-        const raw_course = $(courses[i]);
+      const raw_courses = $("div.course");
+      var courses = [];
+      for (var i = 0; i < raw_courses.length; i++) {
+        const raw_course = $(raw_courses[i]);
         var course = new Course($);
         course
           .parseTitle(raw_course.find("h2").text())
           .parseCourseInfo(raw_course.find(".courseattr .popupdetail")[0])
           .parseSections(raw_course.find(".sections")[0]);
-        // console.log(course);
+
+        courses.push(course);
       }
+      fs.writeFile("ACCT.json", JSON.stringify(courses), err => {
+        if (err) console.error(err);
+        else console.log("File written.");
+      });
     })
     .catch(console.error);
 }

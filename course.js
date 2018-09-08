@@ -25,7 +25,7 @@ function Course($) {
     this.title = title;
     this.subject = subject;
     this.code = code;
-    this.credits = credits;
+    this.credits = parseInt(credits);
     return this;
   };
 
@@ -39,7 +39,11 @@ function Course($) {
     const table = $(courseInfo);
     const headers = table
       .find("th")
-      .map((i, el) => $(el).text())
+      .map((i, el) =>
+        $(el)
+          .text()
+          .toLowerCase()
+      )
       .get();
     const contents = table
       .find("td")
@@ -49,6 +53,17 @@ function Course($) {
     var details = {};
 
     for (var i = 0; i < headers.length; i++) {
+      switch (headers[i]) {
+        case "attributes":
+          contents[i] = contents[i]; //TODO: find way to break lines
+          break;
+        case "pre-requisite": //TODO: parse logical relation
+          break;
+        case "co-requisite": //TODO: parse logical relation
+          break;
+        default:
+          break;
+      }
       details[headers[i]] = contents[i];
     }
     this.details = details;
@@ -108,7 +123,13 @@ function Course($) {
     section.code = id_code[0];
     section.id = parseInt(id_code[1].split(")")[0]);
     section.dateTime = [row[1].split("\n")]; // Split mutliline dateTime
-    section.room = [row[2]];
+    var room = row[2].split(" (");
+    if (room.length === 2) {
+      room[1] = parseInt(room[1].split(")")[0]);
+    } else {
+      room.push(null); // signifies capacity is not listed
+    }
+    section.room = [room]; // Stores (room number, capacity)
     section.instructors = [row[3].split("\n")]; // Split multiline instructors
     section.quota = parseInt(row[4]);
     section.enrol = parseInt(row[5]);
@@ -122,7 +143,13 @@ function Course($) {
     // Parse remaining rows
     for (var i = 1; i < content.length; i++) {
       section.dateTime.push(content[i][0].split("\n"));
-      section.room.push(content[i][1]);
+      var room = content[i][1].split(" (");
+      if (room.length === 2) {
+        room[1] = parseInt(room[1].split(")")[0]);
+      } else {
+        room.push(null); // signifies capacity is not listed
+      }
+      section.room.push(room); // Store (Room number, capacity)
       section.instructors.push(content[i][2].split("\n"));
     }
 
