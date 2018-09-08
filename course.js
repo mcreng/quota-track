@@ -8,7 +8,6 @@ function Course($) {
   this.title = null;
   this.credits = null;
   this.details = null;
-
   this.sections = null;
 
   /**
@@ -65,20 +64,78 @@ function Course($) {
       .map((i, el) => [
         $(el)
           .find("td")
-          .map((i, el) => $(el).text())
+          .map((i, el) => {
+            var children = $($(el).children());
+            if (
+              children.length > 0 && // if contain children
+              !$(children[0]).is("br") && // if children is not <br> (for date time)
+              !$(children[0]).is("a") && // if children is not <a> (for instructors)
+              !$(children[0]).is("strong") // if children is strong (for quotas)
+            ) {
+              return [children.map((i, el) => $(el).text()).get()]; // get text from each children
+            } else {
+              return $(el).text(); // get text as a whole
+            }
+          })
           .get()
       ])
       .get();
 
-    console.log(contents);
+    contents = contents.slice(1).map(x => [x]); // Remove table headers
+
+    for (var i = 0, j = -1; i < contents.length; i++) {
+      if (contents[i][0].length !== 9) {
+        contents[j].push(contents[i][0]);
+      } else {
+        j++;
+        contents[j] = contents[i];
+      }
+    }
+    contents = contents.slice(0, j + 1);
+
+    this.sections = [];
+    for (var i = 0; i < contents.length; i++)
+      this.sections.push(this.parseSection(contents[i]));
+
+    return this;
+  };
+
+  this.parseSection = content => {
+    var section = new Section();
+    // Parse main row
+    const row = content[0];
+    const id_code = row[0].split(" (");
+    section.code = id_code[0];
+    section.id = parseInt(id_code[1].split(")")[0]);
+    section.dateTime = [row[1].split("\n")]; // Split mutliline dateTime
+    section.room = [row[2]];
+    section.instructors = [row[3].split("\n")]; // Split multiline instructors
+    section.quota = parseInt(row[4]);
+    section.enrol = parseInt(row[5]);
+    section.avail = parseInt(row[6]);
+    section.wait = parseInt(row[7]);
+    section.remarks =
+      row[8] === String.fromCharCode(160)
+        ? null
+        : row[8][0].split("\n").map(el => el.replace("> ", "")); // Make " " to null, split multiline remarks anad remove leading "> "
+
+    // Parse remaining rows
+    for (var i = 1; i < content.length; i++) {
+      section.dateTime.push(content[i][0].split("\n"));
+      section.room.push(content[i][1]);
+      section.instructors.push(content[i][2].split("\n"));
+    }
+
+    return section;
   };
 }
 
-function Section($) {
-  this.code = null;
+function Section() {
+  this.id = null; // 4-digit section id
+  this.code = null; // L*, T* or LA* for example
   this.dateTime = null;
   this.room = null;
-  this.instructor = null;
+  this.instructors = null;
   this.quota = null;
   this.enrol = null;
   this.avail = null;
