@@ -16,9 +16,12 @@ function Course($) {
    * @returns {Course}
    */
   this.parseTitle = title => {
-    title = title.split(" - ");
-    var [subject, code] = title[0].split(" ");
-    title = title[1].split(" (");
+    var subject = title.match(/\w{4} \d{4}\w?/g)[0];
+    title = title.replace(subject + " - ", "");
+    var [subject, code] = subject.split(" ");
+
+    title = title.split(" (");
+    console.debug(title);
     var credits = title[1].split(" unit")[0];
     title = title[0];
 

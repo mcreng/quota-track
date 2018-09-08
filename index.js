@@ -1,12 +1,13 @@
 const request = require("request-promise");
 const cheerio = require("cheerio");
 const fs = require("fs");
-const asyncJSON = require("async-json");
 
 const { Course } = require("./course");
 
 var domain = "https://w5.ab.ust.hk/";
 var uri = "https://w5.ab.ust.hk/wcq/cgi-bin/1810/";
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms)); // Sleep function in ms
 
 request({
   uri: uri,
@@ -24,7 +25,13 @@ request({
         return obj;
       })
       .get();
-    parseSubject(depts[0]);
+
+    (async () => {
+      for (var i = 0; i < 5; i++) {
+        parseSubject(depts[i]);
+        await sleep(1000);
+      }
+    })();
   })
   .catch(console.error);
 
@@ -33,7 +40,6 @@ request({
  * @param {Object} subject - Subject code and link
  */
 function parseSubject(subject) {
-  console.log(subject);
   request({
     uri: subject["href"],
     transform: function(body) {
@@ -53,9 +59,9 @@ function parseSubject(subject) {
 
         courses.push(course);
       }
-      fs.writeFile("ACCT.json", JSON.stringify(courses), err => {
+      fs.writeFile(`${subject.subject}.json`, JSON.stringify(courses), err => {
         if (err) console.error(err);
-        else console.log("File written.");
+        else console.log(`${subject.subject}.json written.`);
       });
     })
     .catch(console.error);
