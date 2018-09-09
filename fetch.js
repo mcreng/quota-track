@@ -33,6 +33,7 @@ const fetchCourses = timeout =>
         })
         .get();
       const currentTime = moment().format("YYMMDDhhmmss");
+      fs.existsSync("./subjects") || fs.mkdirSync("./subjects");
       fs.mkdir(`./subjects/${currentTime}/`, err => {
         if (err) logger.error(err);
       });
