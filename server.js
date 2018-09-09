@@ -12,6 +12,7 @@ app.route("/api").get((req, res) => {
   res.status(200).send({ received: true });
 });
 
-setInterval(() => fetchCourses(1000), 1000 * 60 * 15);
+// Fetch once, then after so, fetch again per 60 minutes
+fetchCourses(1000).then(setInterval(() => fetchCourses(1000), 1000 * 60 * 60));
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

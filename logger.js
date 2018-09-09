@@ -4,8 +4,7 @@ log4js.configure({
     dateFile: {
       type: "dateFile",
       filename: "./logs/log.log",
-      compress: true,
-      flags: "w+"
+      compress: true
     },
     stdout: { type: "stdout" }
   },
