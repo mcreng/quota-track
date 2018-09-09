@@ -2,6 +2,7 @@
 echo "*** post-receive: Triggered. ***"
 echo "*** post-receive: Performing git checkout... ***"
 GIT_WORK_TREE=~/quota-track git checkout -f
+cd ~/quota-track && \
 echo "*** post-receive: Performing npm install... ***"
 npm install && \
 echo "*** post-receive: Stopping running app if any... ***" && \
