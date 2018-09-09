@@ -28,5 +28,16 @@
 #### Setups in local
 
 1. `git remote add aws ubuntu@....aws.net`
-2. `git config --global remote.aws.receivepack "git receive-pack".`
+2. `git config --global remote.aws.receivepack "git receive-pack"`
 3. Push by `git push aws`
+
+### Instructions on setting up auto deploy in AWS after `git push`
+
+1. Install `pm2` by `npm i -g pm2`
+2. Append the following to `post-receive`
+   ```sh
+   npm install \
+   && npm run build \
+   && (pm2 delete 'my-app' || true) \
+   && pm2 start npm --name 'my-app' -- start
+   ```

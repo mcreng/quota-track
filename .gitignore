@@ -4,4 +4,11 @@ node_modules
 *.json
 !package.json
 !package-lock.json
+
 *.pem
+.rest
+
+debug
+
+logs
+*.log
