@@ -21,7 +21,6 @@ function Course($) {
     var [subject, code] = subject.split(" ");
 
     title = title.split(" (");
-    console.debug(title);
     var credits = title[1].split(" unit")[0];
     title = title[0];
 

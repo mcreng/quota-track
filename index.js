@@ -27,9 +27,9 @@ request({
       .get();
 
     (async () => {
-      for (var i = 0; i < 5; i++) {
+      for (var i = 0; i < depts.length; i++) {
         parseSubject(depts[i]);
-        await sleep(1000);
+        await sleep(10000);
       }
     })();
   })
@@ -59,10 +59,14 @@ function parseSubject(subject) {
 
         courses.push(course);
       }
-      fs.writeFile(`${subject.subject}.json`, JSON.stringify(courses), err => {
-        if (err) console.error(err);
-        else console.log(`${subject.subject}.json written.`);
-      });
+      fs.writeFile(
+        `./subjects/${subject.subject}.json`,
+        JSON.stringify(courses),
+        err => {
+          if (err) console.error(err);
+          else console.log(`${subject.subject}.json written.`);
+        }
+      );
     })
     .catch(console.error);
 }
