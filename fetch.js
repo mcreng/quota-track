@@ -3,7 +3,7 @@ const cheerio = require("cheerio");
 const fs = require("fs");
 const moment = require("moment");
 const logger = require("./logger")("fetcher");
-
+const extractBasicInfo = require("./extractInfo");
 const { Course } = require("./course");
 
 var domain = "https://w5.ab.ust.hk/";
@@ -33,13 +33,13 @@ const fetchCourses = timeout =>
         })
         .get();
       const currentTime = moment().format("YYMMDDHHmmss");
-      fs.existsSync("./subjects") || fs.mkdirSync("./subjects");
-      fs.mkdir(`./subjects/${currentTime}/`, err => {
-        if (err) logger.error(err);
-      });
+      fs.existsSync("./data") || fs.mkdirSync("./data");
+      fs.existsSync("./data/src") || fs.mkdirSync("./data/src");
+      fs.mkdirSync(`./data/src/${currentTime}/`);
       (async () => {
         for (var i = 0; i < depts.length; i++) {
-          parseSubject(currentTime, depts[i]);
+          await parseSubject(currentTime, depts[i]);
+          extractBasicInfo(currentTime, depts[i]["subject"]);
           await sleep(timeout);
         }
       })();
@@ -52,7 +52,7 @@ const fetchCourses = timeout =>
  * @param {Object} subject - Subject code and link
  */
 function parseSubject(time, subject) {
-  request({
+  return request({
     uri: subject["href"],
     transform: function(body) {
       return cheerio.load(body);
@@ -71,15 +71,12 @@ function parseSubject(time, subject) {
 
         courses.push(course);
       }
-      fs.writeFile(
-        `./subjects/${time}/${subject.subject}.json`,
+      fs.writeFileSync(
+        `./data/src/${time}/${subject.subject}.json`,
         JSON.stringify(courses),
-        { mode: 0755 },
-        err => {
-          if (err) logger.error(err);
-          else logger.info(`${subject.subject}.json written.`);
-        }
+        { mode: 0755 }
       );
+      logger.info(`${subject.subject}.json written.`);
     })
     .catch(logger.error);
 }
