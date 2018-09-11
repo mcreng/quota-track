@@ -3,7 +3,7 @@ const cheerio = require("cheerio");
 const fs = require("fs");
 const moment = require("moment");
 const logger = require("./logger")("fetcher");
-const extractBasicInfo = require("./extractInfo");
+const { extractBasicInfo, extractQuotaInfo } = require("./extractInfo");
 const { Course } = require("./course");
 
 var domain = "https://w5.ab.ust.hk/";
@@ -40,6 +40,7 @@ const fetchCourses = timeout =>
         for (var i = 0; i < depts.length; i++) {
           await parseSubject(currentTime, depts[i]);
           extractBasicInfo(currentTime, depts[i]["subject"]);
+          extractQuotaInfo(currentTime, depts[i]["subject"]);
           await sleep(timeout);
         }
       })();

@@ -6,6 +6,10 @@
     "dev": "node index.js"
   },
   "author": "mcreng",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcreng/quota-track.git"
+  },
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.3",

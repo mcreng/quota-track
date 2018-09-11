@@ -133,10 +133,10 @@ function Course($) {
     }
     section.room = [room]; // Stores (room number, capacity)
     section.instructors = [row[3].split("\n")]; // Split multiline instructors
-    section.quota = parseInt(row[4]);
-    section.enrol = parseInt(row[5]);
-    section.avail = parseInt(row[6]);
-    section.wait = parseInt(row[7]);
+    section.quota = [parseInt(row[4])];
+    section.enrol = [parseInt(row[5])];
+    section.avail = [parseInt(row[6])];
+    section.wait = [parseInt(row[7])];
     section.remarks =
       row[8] === String.fromCharCode(160)
         ? null
