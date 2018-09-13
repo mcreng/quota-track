@@ -16,6 +16,7 @@ Array.prototype.diff = function(a) {
 };
 
 app.route("/api").get((req, res) => {
+  logger.log("/api called.");
   res.status(200).send({ received: true });
 });
 
@@ -24,6 +25,7 @@ app.route("/api").get((req, res) => {
  * @param subject - Subject Name
  */
 app.route("/api/data/quota").get((req, res) => {
+  logger.log(`/api/data/quota called with ${req.body.subject}.json requested.`);
   res
     .status(200)
     .sendFile(`./data/quota/${req.body.subject}.json`, { root: "." });
