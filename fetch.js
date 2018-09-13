@@ -39,8 +39,8 @@ const fetchCourses = timeout =>
       (async () => {
         for (var i = 0; i < depts.length; i++) {
           await parseSubject(currentTime, depts[i]);
-          extractBasicInfo(currentTime, depts[i]["subject"]);
-          extractQuotaInfo(currentTime, depts[i]["subject"]);
+          // extractBasicInfo(currentTime, depts[i]["subject"]);
+          // extractQuotaInfo(currentTime, depts[i]["subject"]);
           await sleep(timeout);
         }
       })();
@@ -61,7 +61,7 @@ function parseSubject(time, subject) {
   })
     .then($ => {
       const raw_courses = $("div.course");
-      var courses = [];
+      var courses = {};
       for (var i = 0; i < raw_courses.length; i++) {
         const raw_course = $(raw_courses[i]);
         var course = new Course($);
@@ -69,8 +69,7 @@ function parseSubject(time, subject) {
           .parseTitle(raw_course.find("h2").text())
           .parseCourseInfo(raw_course.find(".courseattr .popupdetail")[0])
           .parseSections(raw_course.find(".sections")[0]);
-
-        courses.push(course);
+        courses[course["code"]] = course;
       }
       fs.writeFileSync(
         `./data/src/${time}/${subject.subject}.json`,

@@ -110,9 +110,11 @@ function Course($) {
     }
     contents = contents.slice(0, j + 1);
 
-    this.sections = [];
-    for (var i = 0; i < contents.length; i++)
-      this.sections.push(this.parseSection(contents[i]));
+    this.sections = {};
+    for (var i = 0; i < contents.length; i++) {
+      var section = this.parseSection(contents[i]);
+      this.sections[section["id"]] = section;
+    }
 
     return this;
   };

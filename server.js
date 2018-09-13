@@ -24,6 +24,6 @@ app.route("/api/data/quota").get((req, res) => {
 });
 
 // Fetch once, then after so, fetch again per 60 minutes
-// fetchCourses(1000).then(setInterval(() => fetchCourses(1000), 1000 * 60 * 60));
+fetchCourses(1000).then(setInterval(() => fetchCourses(1000), 1000 * 60 * 60));
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
