@@ -9,6 +9,12 @@ const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
 
+Array.prototype.diff = function(a) {
+  return this.filter(function(i) {
+    return a.indexOf(i) < 0;
+  });
+};
+
 app.route("/api").get((req, res) => {
   res.status(200).send({ received: true });
 });

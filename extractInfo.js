@@ -16,8 +16,8 @@ const extractBasicInfo = (folderName, subjectName) => {
     `./data/src/${folderName}/${subjectName}.json`,
     (err, data) => {
       if (err) console.error(err);
-      data.map(course => {
-        return course["sections"].map(section => {
+      Object.entries(data).map(([_, course]) => {
+        return Object.entries(course["sections"]).map(([_, section]) => {
           delete section["quota"];
           delete section["avail"];
           delete section["enrol"];
@@ -50,11 +50,11 @@ const extractQuotaInfo = (folderName, subjectName) => {
     `./data/src/${folderName}/${subjectName}.json`,
     (err, data) => {
       if (err) console.error(err);
-      data.map(course => {
+      Object.entries(data).map(([_, course]) => {
         delete course["title"];
         delete course["credits"];
         delete course["details"];
-        return course["sections"].map(section => {
+        return Object.entries(course["sections"]).map(([_, section]) => {
           delete section["code"];
           delete section["dateTime"];
           delete section["room"];
@@ -78,7 +78,70 @@ const extractQuotaInfo = (folderName, subjectName) => {
           `./data/quota/${subjectName}.json`
         );
 
-        // TODO: Need to merge originalData with data to newData
+        const newData = [originalData]
+          .concat(data) // Put originalData and data into an array and trigger reduce
+          .reduce((result, currentData) => {
+            return (
+              Object.keys(currentData).forEach(currentCourseIndex => {
+                // currentData can be {originalData, data}, loops through courses in data
+                if (!result[currentCourseIndex])
+                  // if course does not exists, just concat
+                  result[currentCourseIndex] = currentData[currentCourseIndex];
+                // otherwise
+                else {
+                  Object.keys(
+                    currentData[currentCourseIndex]["sections"]
+                  ).forEach(
+                    // loop through sections of a course
+                    currentSectionIndex => {
+                      const resultSection = // pointer to current resultSection
+                        result[currentCourseIndex]["sections"][
+                          currentSectionIndex
+                        ];
+                      const currentSection = // pointer to current currentSection
+                        currentData[currentCourseIndex]["sections"][
+                          currentSectionIndex
+                        ];
+                      if (!resultSection)
+                        // if section does not exist, just concat
+                        result[currentCourseIndex]["sections"][
+                          currentSectionIndex
+                        ] =
+                          currentData[currentCourseIndex]["sections"][
+                            currentSectionIndex
+                          ];
+                      else {
+                        // otherwise
+                        const entries = ["quota", "enrol", "avail", "wait"];
+                        entries.forEach(entry => {
+                          // consider the 4 entires, loop through them and concat them
+                          resultSection[entry] = resultSection[entry].concat(
+                            currentSection[entry]
+                          );
+                        });
+                      }
+                    }
+                  );
+                  // Now find the entries is originalData that no longer exist
+                  Object.keys(result[currentCourseIndex]["sections"])
+                    .diff(
+                      Object.keys(currentData[currentCourseIndex]["sections"])
+                    )
+                    // loop through them
+                    .forEach(item => {
+                      const entries = ["quota", "enrol", "avail", "wait"];
+                      entries.forEach(entry => {
+                        // consider the 4 entires, loop through them and append null
+                        result[currentCourseIndex]["sections"][item][
+                          entry
+                        ].push(null);
+                      });
+                    });
+                }
+              }),
+              result // default return value
+            );
+          }, {});
 
         fs.writeFile(
           `./data/quota/${subjectName}.json`,

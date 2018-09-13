@@ -39,8 +39,8 @@ const fetchCourses = timeout =>
       (async () => {
         for (var i = 0; i < depts.length; i++) {
           await parseSubject(currentTime, depts[i]);
-          // extractBasicInfo(currentTime, depts[i]["subject"]);
-          // extractQuotaInfo(currentTime, depts[i]["subject"]);
+          extractBasicInfo(currentTime, depts[i]["subject"]);
+          extractQuotaInfo(currentTime, depts[i]["subject"]);
           await sleep(timeout);
         }
       })();
