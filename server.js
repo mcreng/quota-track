@@ -20,7 +20,7 @@ app.route("/api").get((req, res) => {
 });
 
 /**
- * GET
+ * GET Subject Quota JSON
  * @param subject - Subject Name
  */
 app.route("/api/data/quota").get((req, res) => {

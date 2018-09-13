@@ -36,14 +36,32 @@ const fetchCourses = timeout =>
       fs.existsSync("./data") || fs.mkdirSync("./data");
       fs.existsSync("./data/src") || fs.mkdirSync("./data/src");
       fs.mkdirSync(`./data/src/${currentTime}/`);
-      (async () => {
-        for (var i = 0; i < depts.length; i++) {
-          await parseSubject(currentTime, depts[i]);
-          extractBasicInfo(currentTime, depts[i]["subject"]);
-          extractQuotaInfo(currentTime, depts[i]["subject"]);
-          await sleep(timeout);
-        }
-      })();
+
+      //   (async () => {
+      //     for (var i = 0; i < depts.length; i++) {
+      //       await new Promise(resolve =>
+      //         setTimeout(async () => {
+      //           await parseSubject(currentTime, depts[i]);
+      //           extractBasicInfo(currentTime, depts[i]["subject"]);
+      //           extractQuotaInfo(currentTime, depts[i]["subject"]);
+      //           resolve();
+      //         }, timeout)
+      //       );
+      //     }
+      //   })();
+      // })
+
+      for (var i = 0; i < depts.length; i++) {
+        setTimeout(
+          async i => {
+            await parseSubject(currentTime, depts[i]);
+            extractBasicInfo(currentTime, depts[i]["subject"]);
+            extractQuotaInfo(currentTime, depts[i]["subject"]);
+          },
+          timeout * i,
+          i
+        );
+      }
     })
     .catch(logger.error);
 
