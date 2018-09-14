@@ -28,8 +28,9 @@ app.route("/api/data/quota/:subject").get((req, res) => {
   logger.info(
     `/api/data/quota called with ${req.params.subject}.json requested.`
   );
+  const times = require("./data/times.json");
   const data = require(`./data/quota/${req.params.subject}.json`);
-  res.json(data);
+  res.json([times, data]);
 });
 
 // Fetch once, then after so, fetch again per 60 minutes
