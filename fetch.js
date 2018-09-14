@@ -32,22 +32,34 @@ const fetchCourses = timeout =>
           return obj;
         })
         .get();
-      const currentTime = moment().format("YYMMDDHHmmss");
+      const currentTime = moment();
+      const currentTimeFormated = moment(currentTime).format("YYMMDDHHmmss");
       fs.existsSync("./data") || fs.mkdirSync("./data");
       fs.existsSync("./data/src") || fs.mkdirSync("./data/src");
-      fs.mkdirSync(`./data/src/${currentTime}/`);
+      fs.mkdirSync(`./data/src/${currentTimeFormated}/`);
 
       for (var i = 0; i < depts.length; i++) {
         setTimeout(
           async i => {
-            await parseSubject(currentTime, depts[i]);
-            extractBasicInfo(currentTime, depts[i]["subject"]);
-            extractQuotaInfo(currentTime, depts[i]["subject"]);
+            await parseSubject(currentTimeFormated, depts[i]);
+            extractBasicInfo(currentTimeFormated, depts[i]["subject"]);
+            extractQuotaInfo(currentTimeFormated, depts[i]["subject"]);
           },
           timeout * i,
           i
         );
       }
+
+      var times = [moment(currentTime).format("YYYY-MM-DD HH:mm")];
+      if (fs.existsSync("./data/times.json")) {
+        times = JSON.parse(
+          fs.readFileSync("./data/times.json").toString()
+        ).concat(times);
+      }
+      fs.writeFileSync(`./data/times.json`, JSON.stringify(times), {
+        mode: 0755
+      });
+      logger.info(`times.json updated.`);
     })
     .catch(logger.error);
 

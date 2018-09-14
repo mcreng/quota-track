@@ -24,13 +24,12 @@ app.route("/api").get((req, res) => {
  * GET Subject Quota JSON
  * @param subject - Subject Name
  */
-app.route("/api/data/quota").get((req, res) => {
+app.route("/api/data/quota/:subject").get((req, res) => {
   logger.info(
-    `/api/data/quota called with ${req.body.subject}.json requested.`
+    `/api/data/quota called with ${req.params.subject}.json requested.`
   );
-  res
-    .status(200)
-    .sendFile(`./data/quota/${req.body.subject}.json`, { root: "." });
+  const data = require(`./data/quota/${req.params.subject}.json`);
+  res.json(data);
 });
 
 // Fetch once, then after so, fetch again per 60 minutes
