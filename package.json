@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "Data visualization on enrollment details in HKUST",
   "scripts": {
-    "dev": "node index.js"
+    "client-start": "cd client && npm start",
+    "build": "cd client && npm build",
+    "server-start": "cd server && nodemon server.js",
+    "dev": "concurrently --kill-others-on-fail \"npm run server-start \" \"npm run client-start\"",
+    "start": "node server.js"
   },
   "author": "mcreng",
   "repository": {
@@ -22,6 +26,7 @@
     "request-promise": "^4.2.2"
   },
   "devDependencies": {
-    "nodemon": "^1.18.4"
+    "nodemon": "^1.18.4",
+    "concurrently": "^3.5.0"
   }
 }
