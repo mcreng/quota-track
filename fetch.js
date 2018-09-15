@@ -56,10 +56,29 @@ const fetchCourses = timeout =>
           fs.readFileSync("./data/times.json").toString()
         ).concat(times);
       }
-      fs.writeFileSync(`./data/times.json`, JSON.stringify(times), {
-        mode: 0755
-      });
+      fs.writeFile(
+        `./data/times.json`,
+        JSON.stringify(times),
+        {
+          mode: 0755
+        },
+        err => {
+          if (err) logger.error(err);
+        }
+      );
       logger.info(`times.json updated.`);
+
+      fs.writeFile(
+        `./data/subjects.json`,
+        JSON.stringify(depts.map(dept => dept["subject"])),
+        {
+          mode: 0755
+        },
+        err => {
+          if (err) logger.error(err);
+        }
+      );
+      logger.info(`subjects.json updated.`);
     })
     .catch(logger.error);
 

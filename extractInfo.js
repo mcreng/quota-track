@@ -26,10 +26,8 @@ const extractBasicInfo = (folderName, subjectName) => {
         });
       });
       fs.existsSync(`./data/info/`) || fs.mkdirSync(`./data/info/`);
-      fs.existsSync(`./data/info/${folderName}`) ||
-        fs.mkdirSync(`./data/info/${folderName}`);
       fs.writeFileSync(
-        `./data/info/${folderName}/${subjectName}.json`,
+        `./data/info/${subjectName}.json`,
         JSON.stringify(data),
         {
           mode: 0755
