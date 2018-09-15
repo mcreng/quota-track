@@ -28,8 +28,8 @@ app.route("/api/data/quota/:subject").get((req, res) => {
   logger.info(
     `/api/data/quota called with ${req.params.subject}.json requested.`
   );
-  const times = require("./data/times.json");
-  const data = require(`./data/quota/${req.params.subject}.json`);
+  const times = jsonfile.readFileSync("./data/times.json");
+  const data = jsonfile.readFileSync(`./data/quota/${req.params.subject}.json`);
   res.json([times, data]);
 });
 
