@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const fetchCourses = require("./fetch");
+const schedule = require("node-schedule");
 const logger = require("./logger")("api");
 const jsonfile = require("jsonfile");
 
@@ -34,6 +35,11 @@ app.route("/api/data/quota/:subject").get((req, res) => {
 });
 
 // Fetch once, then after so, fetch again per 60 minutes
-fetchCourses(1000).then(setInterval(() => fetchCourses(1000), 1000 * 60 * 60));
+
+// fetchCourses(1000).then(setInterval(() => fetchCourses(1000), 1000 * 60 * 60));
+schedule.scheduleJob("0 0,30 * * * *", fireDate => {
+  logger.info(`fetchcourse() fired at ${fireDate}`);
+  fetchCourses(1000);
+});
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

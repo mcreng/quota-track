@@ -35,6 +35,7 @@ class App extends Component {
 
   async componentDidMount() {
     const response = await fetch("/api/data/quota/ACCT");
+    console.log(response);
     const content = await response.json();
     this.getData(content, "1010", "1017");
   }
