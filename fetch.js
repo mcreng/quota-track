@@ -61,7 +61,7 @@ const fetchCourses = timeout =>
         );
       }
 
-      var times = [moment(currentTime).format("YYYY-MM-DD HH:mm")];
+      var times = [moment(currentTime).format()];
       if (fs.existsSync(`./data/${semester}/times.json`)) {
         times = JSON.parse(
           fs.readFileSync(`./data/${semester}/times.json`).toString()
