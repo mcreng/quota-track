@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "antd": "^3.9.2",
     "chart.js": "^2.7.2",
     "react": "^16.5.1",
     "react-chartkick": "^0.3.0",
@@ -13,5 +14,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build"
   },
-  "proxy": "http://localhost:5000"
+  "proxy": "http://localhost:5000",
+  "devDependencies": {
+    "@types/react": "^16.4.14"
+  }
 }

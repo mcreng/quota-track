@@ -6,8 +6,8 @@ const logger = require("./logger")("fetcher");
 const { extractBasicInfo, extractQuotaInfo } = require("./extractInfo");
 const { Course } = require("./course");
 
-var domain = "https://w5.ab.ust.hk/";
-var uri = "https://w5.ab.ust.hk/wcq/cgi-bin/";
+const domain = "https://w5.ab.ust.hk/";
+const uri = "https://w5.ab.ust.hk/wcq/cgi-bin/";
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms)); // Sleep function in ms
 
@@ -24,7 +24,7 @@ const fetchCourses = timeout =>
   })
     .then(([response, $]) => {
       const semester = response.request.uri.href.match(/\d{4}/g)[0];
-      var depts = $(".depts")
+      const depts = $(".depts")
         .find("a")
         .map((index, el) => {
           var obj = {};

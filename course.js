@@ -21,7 +21,7 @@ function Course($) {
     var [subject, code] = subject.split(" ");
 
     title = title.split(" (");
-    var credits = title[1].split(" unit")[0];
+    const credits = title[1].split(" unit")[0];
     title = title[0];
 
     this.title = title;
@@ -82,7 +82,7 @@ function Course($) {
         $(el)
           .find("td")
           .map((i, el) => {
-            var children = $($(el).children());
+            const children = $($(el).children());
             if (
               children.length > 0 && // if contain children
               !$(children[0]).is("br") && // if children is not <br> (for date time)
@@ -112,7 +112,7 @@ function Course($) {
 
     this.sections = {};
     for (var i = 0; i < contents.length; i++) {
-      var section = this.parseSection(contents[i]);
+      const section = this.parseSection(contents[i]);
       this.sections[section["id"]] = section;
     }
 

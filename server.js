@@ -111,5 +111,4 @@ app.route("/api/:semester/:subject/:course/:section").get((req, res) => {
 //   logger.info(`fetchCourses() fired at ${fireDate}`);
 //   fetchCourses(1000);
 // });
-
 app.listen(port, () => console.log(`Listening on port ${port}`));
