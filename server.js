@@ -10,34 +10,38 @@ const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
 
+/**
+ * Find the difference between two arrays
+ * @param {Array} a Another array to compare to
+ * @example a.diff(b) - finds the difference in entry between a and b
+ */
 Array.prototype.diff = function(a) {
   return this.filter(function(i) {
     return a.indexOf(i) < 0;
   });
 };
 
-app.route("/api").get((req, res) => {
-  logger.log("/api called.");
-  res.status(200).send({ received: true });
-});
-
 /**
  * GET List of subjects
+ * @param semester Semester id, for example '1810'
  */
-app.route("/api/subjects").get((req, res) => {
-  logger.info("/api/subjects called.");
-  const subjects = jsonfile.readFileSync("./data/subjects.json");
+app.route("/api/:semester/").get((req, res) => {
+  logger.info(`/api/${req.params.semester} called.`);
+  const subjects = jsonfile.readFileSync(
+    `./data/${req.params.semester}/subjects.json`
+  );
   res.json(subjects);
 });
 
 /**
  * GET List of courses
+ * @param semester Semester id, for example '1810'
  * @param subject Subject name, for example 'ACCT'
  */
-app.route("/api/:subject/courses").get((req, res) => {
-  logger.info(`/api/${req.params.subject}/courses called.`);
+app.route("/api/:semester/:subject/").get((req, res) => {
+  logger.info(`/api/${req.params.semester}/${req.params.subject} called.`);
   const subject = jsonfile.readFileSync(
-    `./data/info/${req.params.subject}.json`
+    `./data/${req.params.semester}/info/${req.params.subject}.json`
   );
   const courses = Object.keys(subject);
   res.json(courses);
@@ -45,15 +49,18 @@ app.route("/api/:subject/courses").get((req, res) => {
 
 /**
  * GET List of section codes
+ * @param semester Semester id, for example '1810'
  * @param subject Subject name, for example 'ACCT'
  * @param course Course code, for example '1010'
  */
-app.route("/api/:subject/:course/sections").get((req, res) => {
+app.route("/api/:semester/:subject/:course/").get((req, res) => {
   logger.info(
-    `/api/${req.params.subject}/${req.params.course}/sections called.`
+    `/api/${req.params.semester}/${req.params.subject}/${
+      req.params.course
+    } called.`
   );
   const subject = jsonfile.readFileSync(
-    `./data/info/${req.params.subject}.json`
+    `./data/${req.params.semester}/info/${req.params.subject}.json`
   );
   const codes = Object.keys(subject[req.params.course]["sections"]).map(key => {
     return { [key]: subject[req.params.course]["sections"][key]["code"] };
@@ -63,18 +70,23 @@ app.route("/api/:subject/:course/sections").get((req, res) => {
 
 /**
  * GET List of section codes
+ * @param semester Semester id, for example '1810'
  * @param subject Subject name, for example 'ACCT'
  * @param course Course code, for example '1010'
  * @param section Section id, for example '1017' which corresponds to L1
  */
-app.route("/api/:subject/:course/:section").get((req, res) => {
+app.route("/api/:semester/:subject/:course/:section").get((req, res) => {
   logger.info(
-    `/api/${req.params.subject}/${req.params.course}/${
+    `/api/${req.params.semester}/${req.params.subject}/${req.params.course}/${
       req.params.section
     } called.`
   );
-  const times = jsonfile.readFileSync("./data/times.json");
-  var data = jsonfile.readFileSync(`./data/quota/${req.params.subject}.json`);
+  const times = jsonfile.readFileSync(
+    `./data/${req.params.semester}/times.json`
+  );
+  var data = jsonfile.readFileSync(
+    `./data/${req.params.semester}/quota/${req.params.subject}.json`
+  );
   // remove id
   var { id, ...data } = data[req.params.course]["sections"][req.params.section];
 
@@ -94,9 +106,10 @@ app.route("/api/:subject/:course/:section").get((req, res) => {
 });
 
 // fetch per :00 and :30 and first during deploy
-schedule.scheduleJob("0 0,30 * * * *", fireDate => {
-  logger.info(`fetchCourses() fired at ${fireDate}`);
-  fetchCourses(1000);
-});
+// format: second minute hour day month day-of-week
+// schedule.scheduleJob("0 0,15,30,45 * * * *", fireDate => {
+//   logger.info(`fetchCourses() fired at ${fireDate}`);
+//   fetchCourses(1000);
+// });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

@@ -7,7 +7,7 @@ const { extractBasicInfo, extractQuotaInfo } = require("./extractInfo");
 const { Course } = require("./course");
 
 var domain = "https://w5.ab.ust.hk/";
-var uri = "https://w5.ab.ust.hk/wcq/cgi-bin/1810/";
+var uri = "https://w5.ab.ust.hk/wcq/cgi-bin/";
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms)); // Sleep function in ms
 
@@ -18,11 +18,12 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms)); // Sleep fu
 const fetchCourses = timeout =>
   request({
     uri: uri,
-    transform: function(body) {
-      return cheerio.load(body);
+    transform: (body, response) => {
+      return [response, cheerio.load(body)];
     }
   })
-    .then($ => {
+    .then(([response, $]) => {
+      const semester = response.request.uri.href.match(/\d{4}/g)[0];
       var depts = $(".depts")
         .find("a")
         .map((index, el) => {
@@ -35,15 +36,25 @@ const fetchCourses = timeout =>
       const currentTime = moment();
       const currentTimeFormated = moment(currentTime).format("YYMMDDHHmmss");
       fs.existsSync("./data") || fs.mkdirSync("./data");
-      fs.existsSync("./data/src") || fs.mkdirSync("./data/src");
-      fs.mkdirSync(`./data/src/${currentTimeFormated}/`);
+      fs.existsSync(`./data/${semester}`) || fs.mkdirSync(`./data/${semester}`);
+      fs.existsSync(`./data/${semester}/src`) ||
+        fs.mkdirSync(`./data/${semester}/src`);
+      fs.mkdirSync(`./data/${semester}/src/${currentTimeFormated}/`);
 
       for (var i = 0; i < depts.length; i++) {
         setTimeout(
           async i => {
-            await parseSubject(currentTimeFormated, depts[i]);
-            extractBasicInfo(currentTimeFormated, depts[i]["subject"]);
-            extractQuotaInfo(currentTimeFormated, depts[i]["subject"]);
+            await parseSubject(semester, currentTimeFormated, depts[i]);
+            extractBasicInfo(
+              semester,
+              currentTimeFormated,
+              depts[i]["subject"]
+            );
+            extractQuotaInfo(
+              semester,
+              currentTimeFormated,
+              depts[i]["subject"]
+            );
           },
           timeout * i,
           i
@@ -51,13 +62,13 @@ const fetchCourses = timeout =>
       }
 
       var times = [moment(currentTime).format("YYYY-MM-DD HH:mm")];
-      if (fs.existsSync("./data/times.json")) {
+      if (fs.existsSync(`./data/${semester}/times.json`)) {
         times = JSON.parse(
-          fs.readFileSync("./data/times.json").toString()
+          fs.readFileSync(`./data/${semester}/times.json`).toString()
         ).concat(times);
       }
       fs.writeFile(
-        `./data/times.json`,
+        `./data/${semester}/times.json`,
         JSON.stringify(times),
         {
           mode: 0755
@@ -69,7 +80,7 @@ const fetchCourses = timeout =>
       logger.info(`times.json updated.`);
 
       fs.writeFile(
-        `./data/subjects.json`,
+        `./data/${semester}/subjects.json`,
         JSON.stringify(depts.map(dept => dept["subject"])),
         {
           mode: 0755
@@ -84,10 +95,11 @@ const fetchCourses = timeout =>
 
 /**
  * The entry point of parsing one subject
+ * @param {String} semester - Semester id
  * @param {String} time - Current time
  * @param {Object} subject - Subject code and link
  */
-function parseSubject(time, subject) {
+function parseSubject(semester, time, subject) {
   return request({
     uri: subject["href"],
     transform: function(body) {
@@ -107,7 +119,7 @@ function parseSubject(time, subject) {
         courses[course["code"]] = course;
       }
       fs.writeFileSync(
-        `./data/src/${time}/${subject.subject}.json`,
+        `./data/${semester}/src/${time}/${subject.subject}.json`,
         JSON.stringify(courses),
         { mode: 0755 }
       );

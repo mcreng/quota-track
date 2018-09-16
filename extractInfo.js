@@ -8,12 +8,13 @@ const jsonfile = require("jsonfile");
 const logger = require("./logger")("parser");
 /**
  * Extract basic course information
+ * @param {String} semester - string for semester, e.g. '1810'
  * @param {String} folderName - the string of YYMMDDHHmmss, e.g. '1809011315'
  * @param {String} subjectName - should not include '.json', e.g. 'ACCT'
  */
-const extractBasicInfo = (folderName, subjectName) => {
+const extractBasicInfo = (semester, folderName, subjectName) => {
   jsonfile.readFile(
-    `./data/src/${folderName}/${subjectName}.json`,
+    `./data/${semester}/src/${folderName}/${subjectName}.json`,
     (err, data) => {
       if (err) console.error(err);
       Object.entries(data).map(([_, course]) => {
@@ -25,9 +26,10 @@ const extractBasicInfo = (folderName, subjectName) => {
           return section;
         });
       });
-      fs.existsSync(`./data/info/`) || fs.mkdirSync(`./data/info/`);
+      fs.existsSync(`./data/${semester}/info/`) ||
+        fs.mkdirSync(`./data/${semester}/info/`);
       fs.writeFileSync(
-        `./data/info/${subjectName}.json`,
+        `./data/${semester}/info/${subjectName}.json`,
         JSON.stringify(data),
         {
           mode: 0755
@@ -40,12 +42,13 @@ const extractBasicInfo = (folderName, subjectName) => {
 
 /**
  * Extract course quota information
+ * @param {String} semester - string for semester, e.g. '1810'
  * @param {String} folderName - the string of YYMMDDHHmmss, e.g. '1809011315'
  * @param {String} subjectName - should not include '.json', e.g. 'ACCT'
  */
-const extractQuotaInfo = (folderName, subjectName) => {
+const extractQuotaInfo = (semester, folderName, subjectName) => {
   jsonfile.readFile(
-    `./data/src/${folderName}/${subjectName}.json`,
+    `./data/${semester}/src/${folderName}/${subjectName}.json`,
     (err, data) => {
       if (err) console.error(err);
       Object.entries(data).map(([_, course]) => {
@@ -61,10 +64,11 @@ const extractQuotaInfo = (folderName, subjectName) => {
           return section;
         });
       });
-      fs.existsSync(`./data/quota/`) || fs.mkdirSync(`./data/quota/`);
-      if (!fs.existsSync(`./data/quota/${subjectName}.json`)) {
+      fs.existsSync(`./data/${semester}/quota/`) ||
+        fs.mkdirSync(`./data/${semester}/quota/`);
+      if (!fs.existsSync(`./data/${semester}/quota/${subjectName}.json`)) {
         fs.writeFileSync(
-          `./data/quota/${subjectName}.json`,
+          `./data/${semester}/quota/${subjectName}.json`,
           JSON.stringify(data),
           {
             mode: 0755
@@ -73,7 +77,7 @@ const extractQuotaInfo = (folderName, subjectName) => {
         logger.info(`${subjectName}.json course quota parsed`);
       } else {
         const originalData = jsonfile.readFileSync(
-          `./data/quota/${subjectName}.json`
+          `./data/${semester}/quota/${subjectName}.json`
         );
 
         const newData = [originalData]
@@ -137,12 +141,12 @@ const extractQuotaInfo = (folderName, subjectName) => {
                     });
                 }
               }),
-              result // default return value
-            );
+              result
+            ); // default return value
           }, {});
 
         fs.writeFile(
-          `./data/quota/${subjectName}.json`,
+          `./data/${semester}/quota/${subjectName}.json`,
           JSON.stringify(newData),
           {
             mode: 0755
