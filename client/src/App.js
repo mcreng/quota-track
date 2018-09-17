@@ -1,39 +1,57 @@
 import React, { Component } from "react";
-import ReactChartkick, { LineChart } from "react-chartkick";
-import Chart from "chart.js";
-import logo from "./logo.svg";
+import { Layout, Row, Col } from "antd";
+import QuotaGraph from "./components/QuotaGraph";
 import "./App.css";
 
-ReactChartkick.addAdapter(Chart);
-
+const { Header, Content, Footer } = Layout;
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { data: null };
-  }
-
-  async componentDidMount() {
-    const response = await fetch("/api/ACCT/1010/1017");
-    console.log(response);
-    const content = await response.json();
-    this.setState({ data: content });
-  }
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <LineChart
-          data={this.state.data}
-          xtitle="Time"
-          ytitle="Count"
-          title="ACCT 1010 - L1 (1017)"
-          legend="right"
-          width="40vw"
-          height="40vh"
-        />
+        <Header className="App-header">
+          <p>Hi</p>
+        </Header>
+        <Content className="App-content">
+          <div>
+            <Row>
+              <Col lg={12} sm={24}>
+                <QuotaGraph
+                  semester="1810"
+                  subject="SOSC"
+                  course="1960"
+                  section="3753"
+                />
+              </Col>
+              <Col lg={12} sm={24}>
+                <QuotaGraph
+                  semester="1810"
+                  subject="ISOM"
+                  course="2700"
+                  section="2564"
+                />
+              </Col>
+              <Col lg={12} sm={24}>
+                <QuotaGraph
+                  semester="1810"
+                  subject="COMP"
+                  course="3711H"
+                  section="1928"
+                />
+              </Col>
+              <Col lg={12} sm={24}>
+                <QuotaGraph
+                  semester="1810"
+                  subject="LANG"
+                  course="2030"
+                  section="2929"
+                />
+              </Col>
+            </Row>
+          </div>
+        </Content>
+        <Footer className="App-footer">
+          Made by React, Express and NodeJS
+        </Footer>
       </div>
     );
   }

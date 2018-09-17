@@ -62,8 +62,9 @@ app.route("/api/:semester/:subject/:course/").get((req, res) => {
   const subject = jsonfile.readFileSync(
     `./data/${req.params.semester}/info/${req.params.subject}.json`
   );
-  const codes = Object.keys(subject[req.params.course]["sections"]).map(key => {
-    return { [key]: subject[req.params.course]["sections"][key]["code"] };
+  var codes = {};
+  Object.keys(subject[req.params.course]["sections"]).forEach(key => {
+    codes[key] = subject[req.params.course]["sections"][key]["code"];
   });
   res.json(codes);
 });
@@ -111,4 +112,4 @@ app.route("/api/:semester/:subject/:course/:section").get((req, res) => {
 //   logger.info(`fetchCourses() fired at ${fireDate}`);
 //   fetchCourses(1000);
 // });
-app.listen(port, () => console.log(`Listening on port ${port}`));
+app.listen(port, () => logger.info(`Listening on port ${port}`));
