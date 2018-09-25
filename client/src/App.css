@@ -33,8 +33,3 @@
   line-height: 5vh;
   padding: 0 0;
 }
-
-/* Workaround for changing color of icon */
-.modal-surl .anticon-check-circle {
-  color: #52c41a !important;
-}

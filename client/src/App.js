@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Layout, Row, Col } from "antd";
 import QuotaGraph from "./components/QuotaGraph";
 import "./App.css";
+import QueryForm from "./components/QueryForm";
 
 const { Header, Content, Footer } = Layout;
 class App extends Component {
@@ -13,6 +14,7 @@ class App extends Component {
         </Header>
         <Content className="App-content">
           <div>
+            <QueryForm />
             <Row>
               <Col lg={12} sm={24}>
                 <QuotaGraph
