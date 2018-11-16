@@ -26,11 +26,15 @@ Array.prototype.diff = function(a) {
  * @param semester Semester id, for example '1810'
  */
 app.route("/api/:semester/").get((req, res) => {
-  logger.info(`/api/${req.params.semester} called.`);
-  const subjects = jsonfile.readFileSync(
-    `./data/${req.params.semester}/subjects.json`
-  );
-  res.json(subjects);
+  try {
+    logger.info(`/api/${req.params.semester} called.`);
+    const subjects = jsonfile.readFileSync(
+      `./data/${req.params.semester}/subjects.json`
+    );
+    res.json(subjects);
+  } catch (error) {
+    res.sendStatus(404);
+  }
 });
 
 /**
@@ -39,12 +43,16 @@ app.route("/api/:semester/").get((req, res) => {
  * @param subject Subject name, for example 'ACCT'
  */
 app.route("/api/:semester/:subject/").get((req, res) => {
-  logger.info(`/api/${req.params.semester}/${req.params.subject} called.`);
-  const subject = jsonfile.readFileSync(
-    `./data/${req.params.semester}/info/${req.params.subject}.json`
-  );
-  const courses = Object.keys(subject);
-  res.json(courses);
+  try {
+    logger.info(`/api/${req.params.semester}/${req.params.subject} called.`);
+    const subject = jsonfile.readFileSync(
+      `./data/${req.params.semester}/info/${req.params.subject}.json`
+    );
+    const courses = Object.keys(subject);
+    res.json(courses);
+  } catch (error) {
+    res.sendStatus(404);
+  }
 });
 
 /**
@@ -54,19 +62,23 @@ app.route("/api/:semester/:subject/").get((req, res) => {
  * @param course Course code, for example '1010'
  */
 app.route("/api/:semester/:subject/:course/").get((req, res) => {
-  logger.info(
-    `/api/${req.params.semester}/${req.params.subject}/${
-      req.params.course
-    } called.`
-  );
-  const subject = jsonfile.readFileSync(
-    `./data/${req.params.semester}/info/${req.params.subject}.json`
-  );
-  var codes = {};
-  Object.keys(subject[req.params.course]["sections"]).forEach(key => {
-    codes[key] = subject[req.params.course]["sections"][key]["code"];
-  });
-  res.json(codes);
+  try {
+    logger.info(
+      `/api/${req.params.semester}/${req.params.subject}/${
+        req.params.course
+      } called.`
+    );
+    const subject = jsonfile.readFileSync(
+      `./data/${req.params.semester}/info/${req.params.subject}.json`
+    );
+    var codes = {};
+    Object.keys(subject[req.params.course]["sections"]).forEach(key => {
+      codes[key] = subject[req.params.course]["sections"][key]["code"];
+    });
+    res.json(codes);
+  } catch (error) {
+    res.sendStatus(404);
+  }
 });
 
 /**
@@ -77,33 +89,39 @@ app.route("/api/:semester/:subject/:course/").get((req, res) => {
  * @param section Section id, for example '1017' which corresponds to L1
  */
 app.route("/api/:semester/:subject/:course/:section").get((req, res) => {
-  logger.info(
-    `/api/${req.params.semester}/${req.params.subject}/${req.params.course}/${
+  try {
+    logger.info(
+      `/api/${req.params.semester}/${req.params.subject}/${req.params.course}/${
+        req.params.section
+      } called.`
+    );
+    const times = jsonfile.readFileSync(
+      `./data/${req.params.semester}/times.json`
+    );
+    var data = jsonfile.readFileSync(
+      `./data/${req.params.semester}/quota/${req.params.subject}.json`
+    );
+    // remove id
+    var { id, ...data } = data[req.params.course]["sections"][
       req.params.section
-    } called.`
-  );
-  const times = jsonfile.readFileSync(
-    `./data/${req.params.semester}/times.json`
-  );
-  var data = jsonfile.readFileSync(
-    `./data/${req.params.semester}/quota/${req.params.subject}.json`
-  );
-  // remove id
-  var { id, ...data } = data[req.params.course]["sections"][req.params.section];
+    ];
 
-  const entries = ["avail", "enrol", "quota", "wait"];
-  var graphData = [];
-  // make into appropriate format
-  entries.forEach(entry => {
-    var graphDatum = {};
-    graphDatum["name"] = entry;
-    graphDatum["data"] = {};
-    data[entry].forEach((datum, index) => {
-      graphDatum["data"][times[index]] = datum;
+    const entries = ["avail", "enrol", "quota", "wait"];
+    var graphData = [];
+    // make into appropriate format
+    entries.forEach(entry => {
+      var graphDatum = {};
+      graphDatum["name"] = entry;
+      graphDatum["data"] = {};
+      data[entry].forEach((datum, index) => {
+        graphDatum["data"][times[index]] = datum;
+      });
+      graphData.push(graphDatum);
     });
-    graphData.push(graphDatum);
-  });
-  res.json(graphData);
+    res.json(graphData);
+  } catch (error) {
+    res.sendStatus(404);
+  }
 });
 
 // fetch per :00 and :30 and first during deploy
