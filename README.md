@@ -42,3 +42,18 @@
    && pm2 start npm --name 'my-app' -- start
    ```
 3. (Optional) View real-time log from local by `ssh ubuntu@....aws.net "tail -f ~/my_project/log.log" | ccze` (`ccze` is installed by `apt`).
+
+### Sample POST Configuration
+
+```json
+{
+	"apiKey": ,
+	"config": [{
+		"start": "2018-11-16",
+		"end": "2018-11-20",
+		"per": 60
+	}
+	]
+
+}
+```
