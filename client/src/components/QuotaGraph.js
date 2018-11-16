@@ -20,6 +20,7 @@ class QuotaGraph extends Component {
     data = await data.json();
 
     // add quota to wait
+    // FIXME: Display would be incorrect since quota is added
     Object.keys(data[3]["data"]).forEach(time => {
       data[3]["data"][time] += data[2]["data"][time];
     });
