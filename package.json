@@ -5,7 +5,7 @@
   "scripts": {
     "client-start": "cd client && npm start",
     "build": "cd client && npm build",
-    "server-start": "nodemon server.js",
+    "server-start": "nodemon server.js -i data/",
     "dev": "concurrently --kill-others-on-fail \"npm run server-start \" \"npm run client-start\"",
     "start": "node server.js",
     "postinstall": "cd client && npm install"
@@ -19,6 +19,7 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "cheerio": "^1.0.0-rc.2",
+    "dotenv": "^6.1.0",
     "express": "^4.16.4",
     "jsonfile": "^5.0.0",
     "log4js": "^3.0.6",

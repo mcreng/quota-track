@@ -1,16 +1,23 @@
+# Configuration files
 .vscode
+
+# Node modules
 node_modules
 
+# Data fetched
 *.json
 !package.json
 !package-lock.json
 
+# Key & Environment
 *.pem
+.env
+
+# Testing files
 .rest
-
 debug
+test*
 
+# Logs
 logs
 *.log
-
-test*

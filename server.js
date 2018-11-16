@@ -4,11 +4,14 @@ const fetchCourses = require("./fetch");
 const schedule = require("node-schedule");
 const logger = require("./logger")("api");
 const jsonfile = require("jsonfile");
-
+const util = require("util");
+require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
+
+let jobs = [];
 
 /**
  * Find the difference between two arrays
@@ -20,6 +23,69 @@ Array.prototype.diff = function(a) {
     return a.indexOf(i) < 0;
   });
 };
+
+/**
+ * POST Scrape configuration
+ *
+ * @param apiKey API key for updating configuration
+ * @param config Configuration list, each object in list should include
+ *               - start, task start time
+ *               - end,   task end time
+ *               - per,   interval in minutes
+ */
+app.route("/api/config").post((req, res) => {
+  if (req.body.apiKey !== process.env.apiKey) {
+    res.sendStatus(401);
+  } else {
+    let config = req.body.config;
+    if (config === null || config === undefined) {
+      // Cancel all current jobs
+      jobs.forEach(el => el.cancel());
+      return res.json({ cleared: true });
+    }
+
+    // Check if invalid
+    for (rule of config) {
+      console.log(rule);
+      if (
+        rule.start === null ||
+        rule.start === undefined ||
+        rule.end === null ||
+        rule.end === null ||
+        !Number.isInteger(rule.per)
+      ) {
+        return res.sendStatus(400);
+      }
+    }
+
+    // Map each config json into json that schedule takes
+    config = config.map(rule => {
+      return {
+        start: new Date(rule.start),
+        end: new Date(rule.end),
+        rule: `0 /${rule.per} * * * *`
+      };
+    });
+
+    logger.info(
+      `Got scheduling request: ${util.inspect(config, false, null, true)}`
+    );
+
+    // Cancel all current jobs
+    jobs.forEach(el => el.cancel());
+
+    // Add new job
+    for (rule of config) {
+      jobs.push(
+        schedule.scheduleJob(rule, fireDate => {
+          logger.info(`fetchCourses() fired at ${fireDate}`);
+          fetchCourses(1000);
+        })
+      );
+    }
+    return res.json({ done: true });
+  }
+});
 
 /**
  * GET List of subjects
@@ -124,10 +190,4 @@ app.route("/api/:semester/:subject/:course/:section").get((req, res) => {
   }
 });
 
-// fetch per :00 and :30 and first during deploy
-// format: second minute hour day month day-of-week
-// schedule.scheduleJob("0 0,15,30,45 * * * *", fireDate => {
-//   logger.info(`fetchCourses() fired at ${fireDate}`);
-//   fetchCourses(1000);
-// });
 app.listen(port, () => logger.info(`Listening on port ${port}`));
