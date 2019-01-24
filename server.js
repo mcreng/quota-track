@@ -18,8 +18,8 @@ let jobs = [];
  * @param {Array} a Another array to compare to
  * @example a.diff(b) - finds the difference in entry between a and b
  */
-Array.prototype.diff = function(a) {
-  return this.filter(function(i) {
+Array.prototype.diff = function (a) {
+  return this.filter(function (i) {
     return a.indexOf(i) < 0;
   });
 };
@@ -63,7 +63,7 @@ app.route("/api/config").post((req, res) => {
       return {
         start: new Date(rule.start),
         end: new Date(rule.end),
-        rule: `0 /${rule.per} * * * *`
+        rule: `0 */${rule.per} * * * *`
       };
     });
 
@@ -131,7 +131,7 @@ app.route("/api/:semester/:subject/:course/").get((req, res) => {
   try {
     logger.info(
       `/api/${req.params.semester}/${req.params.subject}/${
-        req.params.course
+      req.params.course
       } called.`
     );
     const subject = jsonfile.readFileSync(
@@ -158,7 +158,7 @@ app.route("/api/:semester/:subject/:course/:section").get((req, res) => {
   try {
     logger.info(
       `/api/${req.params.semester}/${req.params.subject}/${req.params.course}/${
-        req.params.section
+      req.params.section
       } called.`
     );
     const times = jsonfile.readFileSync(
