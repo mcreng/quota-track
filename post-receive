@@ -1,13 +1,19 @@
-#!/bin/sh
-echo "*** post-receive: Triggered. ***"
-echo "*** post-receive: Performing git checkout... ***"
-GIT_WORK_TREE=~/quota-track git checkout -f
-cd ~/quota-track \
-&& echo "*** post-receive: Performing npm install... ***" \
-&& npm install \
-&& echo "*** post-receive: Stopping running app if any... ***" \
-&& (pm2 delete 'quota-track' || true)  \
-&& echo "*** post-receive: Starting app... ***" \
-&& pm2 start npm --name 'quota-track' -- start \
-&& echo "*** post-receive: App deployed. ***"
-echo "*** post-receive: → done. ***"
+#!/bin/bash
+while read oldrev newrev refname
+do
+        branch=$(git rev-parse --symbolic --abbrev-ref $refname)
+        if [ "master" = "$branch" ]; then
+                echo "*** post-receive: Triggered. ***"
+                echo "*** post-receive: Performing git checkout... ***"
+                GIT_WORK_TREE=~/quota-track git checkout -f
+                cd ~/quota-track \
+                && echo "*** post-receive: Performing npm install... ***" \
+                && npm install \
+                && echo "*** post-receive: Stopping running app if any... ***" \
+                && (pm2 delete 'quota-track' || true)  \
+                && echo "*** post-receive: Starting app... ***" \
+                && pm2 start npm --name 'quota-track' -- start \
+                && echo "*** post-receive: App deployed. ***"
+                echo "*** post-receive: → done. ***"
+        fi
+done
